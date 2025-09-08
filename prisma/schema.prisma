@@ -1,0 +1,84 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  SYSTEM @map("system")
+  TENANT @map("tenant")
+}
+
+enum UserStatus {
+  ACTIVE   @map("active")
+  INACTIVE @map("inactive")
+}
+
+model User {
+  id          String      @id @default(uuid()) @db.Uuid
+  name        String
+  email       String?     @unique
+  username    String?     @unique
+  phoneNumber String?     @unique // Must include country code, e.g. +15555555555
+  password    String? // Nullable for OAuth users
+  type        UserType    @default(TENANT)
+  status      UserStatus  @default(ACTIVE)
+  lastLoginAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  TenantUser  TenantUser?
+  Session     Session[]
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.Uuid
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+enum TenantStatus {
+  ACTIVE   @map("active")
+  INACTIVE @map("inactive")
+}
+
+model Tenant {
+  id         String       @id @default(uuid()) @db.Uuid
+  name       String
+  code       String       @unique // 3 letter code
+  domain     String       @unique
+  status     TenantStatus @default(ACTIVE)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  TenantUser TenantUser?
+}
+
+enum TenantRole {
+  OWNER      @map("owner")
+  ADMIN      @map("admin")
+  OUTLET     @map("outlet")
+  FRONTDESK  @map("frontdesk")
+  TECHNICIAN @map("technician")
+}
+
+model TenantUser {
+  id        String     @id @default(uuid()) @db.Uuid
+  tenant    Tenant     @relation(fields: [tenantId], references: [id])
+  tenantId  String     @unique @db.Uuid
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String     @unique @db.Uuid
+  role      TenantRole @default(FRONTDESK)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum OutletStatus {
+  ACTIVE   @map("active")
+  INACTIVE @map("inactive")
+}
