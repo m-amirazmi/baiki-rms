@@ -20,7 +20,7 @@ import { z } from "zod";
 
 const baseUserSchema = z.object({
   name: z.string().min(2).max(100),
-  type: z.enum(UserType).default(UserType.TENANT),
+  type: z.enum(UserType).default(UserType.TENANT).optional(),
 });
 
 export const userSchemas = {

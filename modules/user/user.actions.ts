@@ -11,7 +11,7 @@ type UserResponse = {
   userId: string;
 };
 
-async function registerWithEmailAction(
+export async function registerWithEmailAction(
   input: CreateUserWithEmailInput
 ): Promise<UserResponse> {
   const validated = userSchemas.createWithEmail.parse(input);
@@ -19,7 +19,7 @@ async function registerWithEmailAction(
   return { userId: user.id };
 }
 
-async function registerWithUsernameAction(
+export async function registerWithUsernameAction(
   input: CreateUserWithUsernameInput
 ): Promise<UserResponse> {
   const validated = userSchemas.createWithUsername.parse(input);
@@ -27,7 +27,7 @@ async function registerWithUsernameAction(
   return { userId: user.id };
 }
 
-async function registerPasswordlessAction(
+export async function registerPasswordlessAction(
   input: CreateUserWithUsernameInput
 ): Promise<UserResponse> {
   const validated = userSchemas.createWithUsernamePasswordless.parse(input);
@@ -35,7 +35,7 @@ async function registerPasswordlessAction(
   return { userId: user.id };
 }
 
-async function loginByEmailAction(input: {
+export async function loginByEmailAction(input: {
   email: string;
   password: string;
 }): Promise<UserResponse> {
@@ -43,7 +43,7 @@ async function loginByEmailAction(input: {
   return { userId: user.id };
 }
 
-async function loginByUsernameAction(input: {
+export async function loginByUsernameAction(input: {
   username: string;
   password: string;
 }): Promise<UserResponse> {
@@ -54,15 +54,6 @@ async function loginByUsernameAction(input: {
   return { userId: user.id };
 }
 
-async function updateLastLoginAction(userId: string) {
+export async function updateLastLoginAction(userId: string) {
   await userService.updateLastLogin(userId);
 }
-
-export const userActions = {
-  registerWithEmailAction,
-  registerWithUsernameAction,
-  registerPasswordlessAction,
-  loginByEmailAction,
-  loginByUsernameAction,
-  updateLastLoginAction,
-};
